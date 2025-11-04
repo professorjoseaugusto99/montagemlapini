@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simulador de Defeitos V8.0</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <!-- TELA 1: PEDIR NOME -->
+    <div id="name-input-screen" class="screen-overlay">
+        <div class="screen-content">
+            <h1>Simulador de Defeitos</h1>
+            <p>Por favor, digite seu nome de técnico para o placar:</p>
+            <input type="text" id="name-input" placeholder="Digite seu nome..." maxlength="20">
+            <button id="submit-name-button" class="action-button-screen">Entrar</button>
+        </div>
+    </div>
+
+    <!-- TELA 2: INÍCIO (Placar e Boas-Vindas) -->
+    <div id="start-screen" class="screen-overlay hidden">
+        <div class="screen-content">
+            <h1 id="welcome-message">Seja bem-vindo!</h1>
+            <p>Seu objetivo é resolver 20 problemas. Você começa com 1000 pontos. Diagnósticos errados custam 100 pontos. Boa sorte!</p>
+            
+            <h2>🏆 Placar de Líderes (Tempo Real) 🏆</h2>
+            <ol id="start-leaderboard-display" class="leaderboard-list"></ol>
+            
+            <button id="start-button" class="action-button-screen">Iniciar Jogo</button>
+        </div>
+    </div>
+
+    <!-- TELA 3: FIM DE JOGO (Placar) -->
+    <div id="end-screen" class="screen-overlay hidden">
+        <div class="screen-content">
+            <h1>Fim de Jogo!</h1>
+            <p id="final-score-text">Sua Pontuação Final é: 1000</p>
+            
+            <h2>🏆 Placar de Líderes (Tempo Real) 🏆</h2>
+            <ol id="end-leaderboard-display" class="leaderboard-list"></ol>
+            
+            <button id="play-again-button" class="action-button-screen">Jogar Novamente</button>
+        </div>
+    </div>
+
+    <!-- TELA 4: O JOGO (Começa escondido) -->
+    <div id="game-container" class="game-container hidden">
+        
+        <!-- Placar e Timer -->
+        <div class="game-hud">
+            <div id="score-display">Pontuação: 1000</div>
+            <div id="timer-display">Tempo: 00:00</div>
+        </div>
+        
+        <div class="problem-box">
+            <h2>Relato do Cliente:</h2>
+            <p id="symptom-text">Carregando problema...</p>
+        </div>
+
+        <h2>Painel de Ações do Técnico</h2>
+        
+        <div class="actions-panel">
+            <div class="action-category">
+                <h3>Hardware</h3>
+                <div id="hardware-actions" class="action-buttons-container"></div>
+            </div>
+            
+            <div class="action-category">
+                <h3>Software</h3>
+                <div id="software-actions" class="action-buttons-container"></div>
+            </div>
+        </div>
+
+        <div id="feedback-text"></div>
+        <button id="next-button">Próximo Problema</button>
+    </div>
+
+    <!-- SDKS DO FIREBASE (V8.0) -->
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
+
+    <!-- NOSSO SCRIPT DO JOGO (V8.0) -->
+    <script src="script.js"></script>
+</body>
+</html>
