@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Simulador de Defeitos V8.0</title>
+    <title>Simulador de Defeitos V9.0</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
@@ -20,7 +20,7 @@
 
     <!-- TELA 2: INÍCIO (Placar e Boas-Vindas) -->
     <div id="start-screen" class="screen-overlay hidden">
-        <div class="screen-content">
+        <div class="screen-content" style="position: relative;">
             <h1 id="welcome-message">Seja bem-vindo!</h1>
             <p>Seu objetivo é resolver 20 problemas. Você começa com 1000 pontos. Diagnósticos errados custam 100 pontos. Boa sorte!</p>
             
@@ -28,6 +28,9 @@
             <ol id="start-leaderboard-display" class="leaderboard-list"></ol>
             
             <button id="start-button" class="action-button-screen">Iniciar Jogo</button>
+            
+            <!-- Botão Secreto do Professor -->
+            <button id="open-admin-button" class="admin-btn">Admin</button>
         </div>
     </div>
 
@@ -44,10 +47,8 @@
         </div>
     </div>
 
-    <!-- TELA 4: O JOGO (Começa escondido) -->
+    <!-- TELA 4: O JOGO -->
     <div id="game-container" class="game-container hidden">
-        
-        <!-- Placar e Timer -->
         <div class="game-hud">
             <div id="score-display">Pontuação: 1000</div>
             <div id="timer-display">Tempo: 00:00</div>
@@ -65,7 +66,6 @@
                 <h3>Hardware</h3>
                 <div id="hardware-actions" class="action-buttons-container"></div>
             </div>
-            
             <div class="action-category">
                 <h3>Software</h3>
                 <div id="software-actions" class="action-buttons-container"></div>
@@ -76,11 +76,22 @@
         <button id="next-button">Próximo Problema</button>
     </div>
 
-    <!-- SDKS DO FIREBASE (V8.0) -->
+    <!-- TELA 5: PAINEL DO PROFESSOR (ADMIN) -->
+    <div id="admin-screen" class="screen-overlay hidden">
+        <div class="screen-content admin-content">
+            <h1>👨‍🏫 Painel do Professor</h1>
+            <p>Gerencie as pontuações dos alunos abaixo.</p>
+            
+            <ul id="admin-leaderboard-display" class="leaderboard-list admin-list"></ul>
+            
+            <button id="close-admin-button" class="action-button-screen" style="background-color: #6c757d;">Sair do Painel</button>
+        </div>
+    </div>
+
+    <!-- SDKS DO FIREBASE -->
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
-
-    <!-- NOSSO SCRIPT DO JOGO (V8.0) -->
+    
     <script src="script.js"></script>
 </body>
 </html>
