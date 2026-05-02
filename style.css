@@ -95,16 +95,18 @@ body {
     list-style: none;
     padding: 0;
     margin-top: 15px;
-    max-height: 200px; /* Altura máxima com scroll */
-    overflow-y: auto; /* Scroll se a lista for longa */
+    max-height: 400px; /* Dobrei o tamanho da caixa */
+    overflow-y: auto; 
     border: 1px solid #eee;
     border-radius: 5px;
 }
+
+/* Aproveitando para deixar as letras do placar um pouco maiores */
 .leaderboard-list li {
     display: flex;
     justify-content: space-between;
-    padding: 10px 15px;
-    font-size: 1.1em;
+    padding: 12px 20px; /* Mais espaço interno */
+    font-size: 1.3em; /* Letra maior */
     font-weight: bold;
     color: #444;
 }
