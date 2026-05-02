@@ -40,34 +40,34 @@ document.addEventListener("DOMContentLoaded", () => {
         ]
     };
 
+    // --- BANCO DE DADOS (V9.2 - Com a "Pegadinha" do Instrutor) ---
     const problemsDB = [
-        { symptom: "Meu PC liga, todas as ventoinhas giram, mas não dá vídeo e minha placa-mãe não emite bipes.", solution_id: "action_ram", close_guess_ids: ["action_gpu", "action_mobo", "action_psu"], points_reward: 250, feedbackCorrect: "Perfeito! Era um módulo de RAM com mau contato. Você reencaixou e o PC deu vídeo." },
+        { 
+            symptom: "Meu PC liga, todas as ventoinhas giram, mas não dá vídeo e minha placa-mãe não emite bipes.", 
+            solution_id: "action_ram", 
+            close_guess_ids: ["action_gpu", "action_mobo", "action_psu"], 
+            points_reward: 250, 
+            // A pegadinha está aqui no feedback!
+            feedbackCorrect: "Perfeito! Era um módulo de RAM com mau contato. Mesmo sem bipes (provavelmente o gabinete estava sem o Speaker/Buzzer interno), o sintoma de girar tudo e não dar vídeo é um clássico da RAM!" 
+        },
         { symptom: "PC desligou sozinho durante um jogo. Agora, ele liga e desliga após 5 segundos, antes de dar vídeo.", solution_id: "action_psu", close_guess_ids: ["action_cpu_cooler", "action_mobo"], points_reward: 250, feedbackCorrect: "Diagnóstico preciso. A fonte de alimentação estava com defeito." },
         { symptom: "O PC liga, o Windows inicia (dá para ouvir o som), mas a tela está cheia de 'artefatos' (linhas, quadrados coloridos).", solution_id: "action_gpu", close_guess_ids: ["action_drivers", "action_ram"], points_reward: 250, feedbackCorrect: "Correto! A memória da placa de vídeo (VRAM) estava corrompida. A troca da GPU resolveu." },
         { symptom: "O PC liga, passa da BIOS, mas trava na tela de 'Carregando Windows' ou dá erro 'Disk Read Error'.", solution_id: "action_storage", close_guess_ids: ["action_bios", "action_ram"], points_reward: 250, feedbackCorrect: "Isso! O cabo de dados SATA do SSD estava solto. Reconectar resolveu." },
         { symptom: "O PC funciona bem para navegar, mas após 10 minutos de jogo, ele trava ou desliga sozinho. Está muito quente.", solution_id: "action_cpu_cooler", close_guess_ids: ["action_psu"], points_reward: 250, feedbackCorrect: "Exato! A pasta térmica do processador estava seca. Após a troca, as temperaturas voltaram ao normal." },
         { symptom: "PC totalmente 'morto'. Não liga, não acende LED, não gira ventoinha. Já testei a fonte em outro PC e ela funciona.", solution_id: "action_mobo", close_guess_ids: ["action_psu", "action_ram"], points_reward: 350, feedbackCorrect: "Diagnóstico de mestre. A placa-mãe estava em curto. A troca dela resolveu." },
-        
-        // PROBLEMA 7 REVISADO: Foco na Bateria
         { symptom: "Toda vez que desligo o PC da tomada, o relógio e a data da BIOS voltam para o ano 2000.", solution_id: "action_cmos_reset", close_guess_ids: ["action_bios", "action_mobo"], points_reward: 250, feedbackCorrect: "Isso mesmo! A bateria CR2032 da placa-mãe estava gasta. A troca manteve as configurações salvas." },
-        
         { symptom: "Acabei de instalar um SSD novo, mas o PC insiste em ligar pelo HD antigo.", solution_id: "action_bios", close_guess_ids: ["action_storage", "action_format"], points_reward: 250, feedbackCorrect: "Exato! Era só entrar na BIOS e definir o 'Windows Boot Manager' do SSD novo como prioridade #1." },
         { symptom: "Acabei de formatar o PC, mas a imagem está 'esticada' (resolução 800x600) e não consigo me conectar à internet.", solution_id: "action_drivers", close_guess_ids: ["action_format", "action_sfc"], points_reward: 250, feedbackCorrect: "Correto. Faltava instalar os drivers de Chipset, Vídeo e Rede." },
         { symptom: "O PC está MUITO lento, o antivírus detecta 50 'ameaças', remove, e elas voltam na próxima reinicialização.", solution_id: "action_format", close_guess_ids: ["action_antivirus", "action_sfc", "action_safemode"], points_reward: 250, feedbackCorrect: "Infelizmente era a única solução. Um Rootkit se instalou. A formatação limpou o sistema." },
         { symptom: "O PC está normal, mas de vez em quando abre um pop-up de propaganda do nada, mesmo com o navegador fechado.", solution_id: "action_antivirus", close_guess_ids: ["action_format", "action_sfc"], points_reward: 250, feedbackCorrect: "Isso. Não era um vírus, mas um 'Adware' irritante. Uma passada de Malwarebytes resolveu." },
         { symptom: "O Windows inicia, mas o Menu Iniciar não abre, a busca não funciona e o Painel de Controle dá erro.", solution_id: "action_sfc", close_guess_ids: ["action_format", "action_antivirus", "action_drivers", "action_safemode"], points_reward: 250, feedbackCorrect: "Boa! Você rodou 'sfc /scannow' e ele reparou arquivos corrompidos do Windows." },
-        
-        // PROBLEMA 13 NOVO: Usa o Modo de Segurança
         { symptom: "O PC estava normal ontem. Hoje ele liga, mas dá Tela Azul (BSOD) na exata hora que vai carregar a Área de Trabalho do Windows.", solution_id: "action_safemode", close_guess_ids: ["action_format", "action_sfc", "action_drivers"], points_reward: 250, feedbackCorrect: "Perfeito! Você usou o Modo de Segurança para acessar o Windows sem carregar o driver que estava causando a Tela Azul e resolveu o problema." },
-        
         { symptom: "Acabei de me mudar. Montei o PC na casa nova e agora ele não liga. Nenhum sinal de vida.", solution_id: "action_psu", close_guess_ids: ["action_mobo"], points_reward: 250, feedbackCorrect: "Isso! Na mudança, o cabo de força da fonte (interno ou externo) ficou frouxo. Reconectar resolveu." },
         { symptom: "O som do meu PC parou de funcionar do nada. Já verifiquei o volume e o fone de ouvido.", solution_id: "action_drivers", close_guess_ids: ["action_format", "action_sfc"], points_reward: 250, feedbackCorrect: "Correto. Uma atualização do Windows corrompeu o driver de áudio. Reinstalar o driver resolveu." },
         { symptom: "O PC estava funcionando, mas adicionei um pente de memória novo e agora ele não liga mais (emite 3 bipes longos).", solution_id: "action_ram", close_guess_ids: ["action_mobo"], points_reward: 250, feedbackCorrect: "Exato. O pente de memória novo era incompatível (ou com defeito). Retirar ele e deixar o antigo fez o PC voltar." },
         { symptom: "O PC liga, mas a ventoinha do processador faz um barulho muito alto, como se estivesse 'raspando', e o PC está lento.", solution_id: "action_cpu_cooler", close_guess_ids: ["action_psu", "action_gpu"], points_reward: 250, feedbackCorrect: "Isso mesmo. O cooler do processador estava travado de poeira e com defeito. A troca dele resolveu o barulho." },
         { symptom: "Meu PC tem um HD de 1TB e um SSD, mas o HD 'sumiu' do 'Meu Computador'.", solution_id: "action_storage", close_guess_ids: ["action_drivers", "action_bios"], points_reward: 250, feedbackCorrect: "Boa. O cabo de energia SATA do HD estava solto. Reconectar fez ele 'reaparecer' no Windows." },
         { symptom: "O PC liga, funciona, mas quando abro qualquer jogo, o jogo fecha sozinho ou o PC reinicia.", solution_id: "action_gpu", close_guess_ids: ["action_drivers", "action_psu", "action_cpu_cooler"], points_reward: 250, feedbackCorrect: "Correto. A placa de vídeo estava superaquecendo por poeira. Uma limpeza resolveu." },
-        
-        // PROBLEMA 20 REVISADO: Clear CMOS em problema de não dar vídeo
         { symptom: "Eu tentei fazer um overclock nas memórias pela BIOS e agora o PC liga, as ventoinhas giram rápido, mas não dá vídeo.", solution_id: "action_cmos_reset", close_guess_ids: ["action_ram", "action_gpu", "action_mobo"], points_reward: 250, feedbackCorrect: "Mestre! Como não dava vídeo, era impossível entrar na BIOS pelo teclado. Fazer o Clear CMOS via Hardware restaurou os padrões e o PC voltou a dar vídeo." }
     ];
 
