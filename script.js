@@ -16,7 +16,6 @@ document.addEventListener("DOMContentLoaded", () => {
     if (!firebase.apps.length) { firebase.initializeApp(firebaseConfig); }
     const db = firebase.database();
 
-    // --- BANCOS DE DADOS (Ações e Defeitos da V9.2) ---
     const allActionsDB = {
         hardware: [
             { id: "action_ram", text: "Verificar/Reencaixar Memória RAM", image: "imagens/acao_ram.png" },
@@ -69,22 +68,20 @@ document.addEventListener("DOMContentLoaded", () => {
         admin: document.getElementById("admin-screen")
     };
     
-    // Inputs Iniciais
+    // Inputs Iniciais (Removido o de Turma)
     const nameInput = document.getElementById("name-input");
     const anoInput = document.getElementById("ano-input");
     const semInput = document.getElementById("semestre-input");
     const turnoInput = document.getElementById("turno-input");
-    const turmaInput = document.getElementById("turma-input");
     
-    // Filtros
     const filters = [document.getElementById("start-filter"), document.getElementById("end-filter"), document.getElementById("admin-filter")];
 
     let currentUserData = {};
     let currentProblemIndex = 0;
     let totalScore = 1000;
     let shuffledProblems = [];
-    let allLeaderboardData = []; // Guarda TODOS os dados
-    let currentFilterSelection = "ALL"; // Filtro atual
+    let allLeaderboardData = []; 
+    let currentFilterSelection = "ALL"; 
     let timerInterval = null;
     let secondsElapsed = 0;
 
@@ -93,7 +90,6 @@ document.addEventListener("DOMContentLoaded", () => {
         document.getElementById(screenId).classList.remove("hidden");
     }
 
-    // --- FIREBASE & PLACAR COM FILTROS (V10.0) ---
     function addScoreToLeaderboard(scoreData) {
         db.ref('leaderboard').push(scoreData); 
     }
@@ -106,9 +102,8 @@ document.addEventListener("DOMContentLoaded", () => {
 
     window.changeFilter = function(value) {
         currentFilterSelection = value;
-        // Sincroniza todos os dropdowns de filtro
         filters.forEach(f => f.value = value);
-        renderLeaderboards(); // Atualiza a tela
+        renderLeaderboards(); 
     };
 
     function formatTime(totalSeconds) {
@@ -122,7 +117,7 @@ document.addEventListener("DOMContentLoaded", () => {
             const data = snapshot.val();
             if (data) {
                 allLeaderboardData = Object.keys(data).map(key => ({ id: key, ...data[key] }));
-                updateFilterOptions(); // Atualiza a lista de turmas no dropdown
+                updateFilterOptions(); 
             } else {
                 allLeaderboardData = [];
             }
@@ -131,45 +126,38 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     function updateFilterOptions() {
-        // Pega todas as "classKeys" únicas do banco de dados
         const uniqueClasses = new Set();
         allLeaderboardData.forEach(entry => {
             if(entry.classKey) uniqueClasses.add(entry.classKey);
         });
 
-        // Atualiza todos os dropdowns de filtro
         filters.forEach(select => {
             select.innerHTML = '<option value="ALL">Geral (Melhores da História)</option>';
             uniqueClasses.forEach(c => {
                 const opt = document.createElement('option');
                 opt.value = c;
                 opt.textContent = `Turma: ${c}`;
-                // Mantém selecionado se já estava
                 if(c === currentFilterSelection) opt.selected = true;
                 select.appendChild(opt);
             });
-            select.value = currentFilterSelection; // Força seleção correta
+            select.value = currentFilterSelection; 
         });
     }
 
     function renderLeaderboards() {
-        // 1. Aplica o Filtro
         let filteredData = allLeaderboardData;
         if (currentFilterSelection !== "ALL") {
             filteredData = allLeaderboardData.filter(e => e.classKey === currentFilterSelection);
         }
 
-        // 2. Ordena
         filteredData.sort((a, b) => {
             if (a.score !== b.score) return b.score - a.score;
             return a.time - b.time;
         });
 
-        // 3. Limita o tamanho (Top 15 Geral, Top 30 na Turma)
         const limit = currentFilterSelection === "ALL" ? 15 : 30;
         filteredData = filteredData.slice(0, limit);
 
-        // 4. Desenha nas telas
         drawList('start-leaderboard-display', filteredData, false);
         drawList('end-leaderboard-display', filteredData, false);
         drawList('admin-leaderboard-display', filteredData, true);
@@ -189,7 +177,6 @@ document.addEventListener("DOMContentLoaded", () => {
                         <span>${entry.score} pts</span>
                         <span>${formatTime(entry.time)}</span>`;
             if (isAdmin) {
-                // No admin, mostra qual é a turma e o botão de apagar
                 html += `<span style="font-size: 0.7em; color: #888;">[${entry.classKey || 'Sem Turma'}]</span>`;
                 html += `<button class="delete-btn" onclick="deleteScore('${entry.id}')">Excluir</button>`;
             }
@@ -201,17 +188,14 @@ document.addEventListener("DOMContentLoaded", () => {
     // --- LÓGICA DO JOGO ---
     document.getElementById("submit-name-button").onclick = () => {
         const name = nameInput.value.trim();
-        const t = turmaInput.value.trim().toUpperCase();
         if (!name) return alert("Digite seu nome!");
-        if (!t) return alert("Digite qual é a sua turma (Ex: A, Info)!");
 
-        // Cria a string única da turma: "2026 - 1º Sem - Manhã - A"
-        const classKey = `${anoInput.value} - ${semInput.value} - ${turnoInput.value} - ${t}`;
+        // Cria a string única apenas com os selects: "2026 - 1º Sem - Manhã"
+        const classKey = `${anoInput.value} - ${semInput.value} - ${turnoInput.value}`;
 
         currentUserData = { name, classKey };
         document.getElementById("welcome-message").textContent = `Bem-vindo, ${name}! (${classKey})`;
         
-        // Já muda o filtro pra turma dele automaticamente!
         changeFilter(classKey);
         showScreen("start-screen");
     };
