@@ -7,13 +7,34 @@
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-
-    <!-- TELA 1: PEDIR NOME -->
+    <!-- TELA 1: PEDIR NOME E TURMA -->
     <div id="name-input-screen" class="screen-overlay">
         <div class="screen-content">
             <h1>Simulador de Defeitos</h1>
-            <p>Por favor, digite seu nome de técnico para o placar:</p>
-            <input type="text" id="name-input" placeholder="Digite seu nome..." maxlength="20">
+            <p>Preencha seus dados para o placar:</p>
+            
+            <input type="text" id="name-input" placeholder="Digite seu nome..." maxlength="20" style="margin-bottom: 10px;">
+            
+            <div class="turma-inputs">
+                <select id="ano-input">
+                    <option value="2026">2026</option>
+                    <option value="2027">2027</option>
+                </select>
+                
+                <select id="semestre-input">
+                    <option value="1º Sem">1º Semestre</option>
+                    <option value="2º Sem">2º Semestre</option>
+                </select>
+                
+                <select id="turno-input">
+                    <option value="Manhã">Manhã</option>
+                    <option value="Tarde">Tarde</option>
+                    <option value="Noite">Noite</option>
+                </select>
+                
+                <input type="text" id="turma-input" placeholder="Turma (Ex: A, B)" maxlength="5">
+            </div>
+
             <button id="submit-name-button" class="action-button-screen">Entrar</button>
         </div>
     </div>
@@ -22,14 +43,18 @@
     <div id="start-screen" class="screen-overlay hidden">
         <div class="screen-content" style="position: relative;">
             <h1 id="welcome-message">Seja bem-vindo!</h1>
-            <p>Seu objetivo é resolver 20 problemas. Você começa com 1000 pontos. Diagnósticos errados custam 100 pontos. Boa sorte!</p>
+            <p>Seu objetivo é resolver 20 problemas. Você começa com 1000 pontos. Diagnósticos errados custam 100 pontos.</p>
             
-            <h2>🏆 Placar de Líderes (Tempo Real) 🏆</h2>
+            <h2>🏆 Placar de Líderes 🏆</h2>
+            
+            <!-- NOVO: Filtro do Placar -->
+            <select class="placar-filter" id="start-filter" onchange="changeFilter(this.value)">
+                <option value="ALL">Geral (Melhores da História)</option>
+            </select>
+
             <ol id="start-leaderboard-display" class="leaderboard-list"></ol>
             
             <button id="start-button" class="action-button-screen">Iniciar Jogo</button>
-            
-            <!-- Botão Secreto do Professor -->
             <button id="open-admin-button" class="admin-btn">Admin</button>
         </div>
     </div>
@@ -40,27 +65,30 @@
             <h1>Fim de Jogo!</h1>
             <p id="final-score-text">Sua Pontuação Final é: 1000</p>
             
-            <h2>🏆 Placar de Líderes (Tempo Real) 🏆</h2>
+            <h2>🏆 Placar de Líderes 🏆</h2>
+            
+            <!-- NOVO: Filtro do Placar -->
+            <select class="placar-filter" id="end-filter" onchange="changeFilter(this.value)">
+                <option value="ALL">Geral (Melhores da História)</option>
+            </select>
+
             <ol id="end-leaderboard-display" class="leaderboard-list"></ol>
             
             <button id="play-again-button" class="action-button-screen">Jogar Novamente</button>
         </div>
     </div>
 
-    <!-- TELA 4: O JOGO -->
+    <!-- TELA 4: O JOGO (Mantido igual) -->
     <div id="game-container" class="game-container hidden">
         <div class="game-hud">
             <div id="score-display">Pontuação: 1000</div>
             <div id="timer-display">Tempo: 00:00</div>
         </div>
-        
         <div class="problem-box">
             <h2>Relato do Cliente:</h2>
             <p id="symptom-text">Carregando problema...</p>
         </div>
-
         <h2>Painel de Ações do Técnico</h2>
-        
         <div class="actions-panel">
             <div class="action-category">
                 <h3>Hardware</h3>
@@ -71,7 +99,6 @@
                 <div id="software-actions" class="action-buttons-container"></div>
             </div>
         </div>
-
         <div id="feedback-text"></div>
         <button id="next-button">Próximo Problema</button>
     </div>
@@ -80,10 +107,14 @@
     <div id="admin-screen" class="screen-overlay hidden">
         <div class="screen-content admin-content">
             <h1>👨‍🏫 Painel do Professor</h1>
-            <p>Gerencie as pontuações dos alunos abaixo.</p>
+            <p>Gerencie as pontuações.</p>
             
+            <!-- Filtro também no Admin -->
+            <select class="placar-filter" id="admin-filter" onchange="changeFilter(this.value)">
+                <option value="ALL">Geral (Melhores da História)</option>
+            </select>
+
             <ul id="admin-leaderboard-display" class="leaderboard-list admin-list"></ul>
-            
             <button id="close-admin-button" class="action-button-screen" style="background-color: #6c757d;">Sair do Painel</button>
         </div>
     </div>
