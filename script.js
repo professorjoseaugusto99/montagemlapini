@@ -1,6 +1,6 @@
 document.addEventListener("DOMContentLoaded", () => {
 
-    // --- CONFIGURAÇÃO DO FIREBASE (V9.0) ---
+    // --- 1. COLE SEU FIREBASE CONFIG AQUI EMBAIXO ---
     const firebaseConfig = {
       apiKey: "AIzaSyA290FhJUsr0PxigVCtYSPdYFOToLZBGUo",
       authDomain: "simuladordefeitos.firebaseapp.com",
@@ -13,13 +13,10 @@ document.addEventListener("DOMContentLoaded", () => {
     };
     // ------------------------------------------------
 
-    // Inicializa o Firebase
-    if (!firebase.apps.length) {
-        firebase.initializeApp(firebaseConfig);
-    }
+    if (!firebase.apps.length) { firebase.initializeApp(firebaseConfig); }
     const db = firebase.database();
 
-    // --- BANCO DE DADOS (V9.1 - Revisado) ---
+    // --- BANCOS DE DADOS (Ações e Defeitos da V9.2) ---
     const allActionsDB = {
         hardware: [
             { id: "action_ram", text: "Verificar/Reencaixar Memória RAM", image: "imagens/acao_ram.png" },
@@ -28,28 +25,20 @@ document.addEventListener("DOMContentLoaded", () => {
             { id: "action_storage", text: "Verificar Cabos/Trocar SSD/HD", image: "imagens/acao_storage.png" },
             { id: "action_cpu_cooler", text: "Verificar Cooler/Reaplicar Pasta Térmica", image: "imagens/acao_cpu_cooler.png" },
             { id: "action_mobo", text: "Trocar Placa-mãe", image: "imagens/acao_mobo.png" },
-            { id: "action_cmos_reset", text: "Trocar Bateria CR2032 / Clear CMOS (Jumper)", image: "imagens/acao_cmos_reset.png" } // <--- TEXTO ATUALIZADO
+            { id: "action_cmos_reset", text: "Trocar Bateria CR2032 / Clear CMOS (Jumper)", image: "imagens/acao_cmos_reset.png" }
         ],
         software: [
-            { id: "action_bios", text: "Acessar BIOS (Ordem de Boot, Configurações)", image: "imagens/acao_bios.png" }, // <--- TEXTO ATUALIZADO
+            { id: "action_bios", text: "Acessar BIOS (Ordem de Boot, Configurações)", image: "imagens/acao_bios.png" },
             { id: "action_drivers", text: "Atualizar/Reinstalar Drivers (Vídeo, Áudio, Rede)", image: "imagens/acao_drivers.png" },
             { id: "action_format", text: "Formatar e Reinstalar S.O.", image: "imagens/acao_format.png" },
             { id: "action_antivirus", text: "Passar Antivírus e Anti-Malware", image: "imagens/acao_antivirus.png" },
             { id: "action_sfc", text: "Rodar 'sfc /scannow' (Verificador de Arquivos)", image: "imagens/acao_sfc.png" },
-            { id: "action_safemode", text: "Iniciar em Modo de Segurança / Restauração do Sistema", image: "imagens/acao_safemode.png" } // <--- NOVA AÇÃO
+            { id: "action_safemode", text: "Iniciar em Modo de Segurança / Restauração do Sistema", image: "imagens/acao_safemode.png" }
         ]
     };
 
-    // --- BANCO DE DADOS (V9.2 - Com a "Pegadinha" do Instrutor) ---
     const problemsDB = [
-        { 
-            symptom: "Meu PC liga, todas as ventoinhas giram, mas não dá vídeo e minha placa-mãe não emite bipes.", 
-            solution_id: "action_ram", 
-            close_guess_ids: ["action_gpu", "action_mobo", "action_psu"], 
-            points_reward: 250, 
-            // A pegadinha está aqui no feedback!
-            feedbackCorrect: "Perfeito! Era um módulo de RAM com mau contato. Mesmo sem bipes (provavelmente o gabinete estava sem o Speaker/Buzzer interno), o sintoma de girar tudo e não dar vídeo é um clássico da RAM!" 
-        },
+        { symptom: "Meu PC liga, todas as ventoinhas giram, mas não dá vídeo e minha placa-mãe não emite bipes.", solution_id: "action_ram", close_guess_ids: ["action_gpu", "action_mobo", "action_psu"], points_reward: 250, feedbackCorrect: "Perfeito! Era um módulo de RAM com mau contato. Mesmo sem bipes (gabinete sem Speaker interno), o sintoma de girar tudo e não dar vídeo é um clássico da RAM!" },
         { symptom: "PC desligou sozinho durante um jogo. Agora, ele liga e desliga após 5 segundos, antes de dar vídeo.", solution_id: "action_psu", close_guess_ids: ["action_cpu_cooler", "action_mobo"], points_reward: 250, feedbackCorrect: "Diagnóstico preciso. A fonte de alimentação estava com defeito." },
         { symptom: "O PC liga, o Windows inicia (dá para ouvir o som), mas a tela está cheia de 'artefatos' (linhas, quadrados coloridos).", solution_id: "action_gpu", close_guess_ids: ["action_drivers", "action_ram"], points_reward: 250, feedbackCorrect: "Correto! A memória da placa de vídeo (VRAM) estava corrompida. A troca da GPU resolveu." },
         { symptom: "O PC liga, passa da BIOS, mas trava na tela de 'Carregando Windows' ou dá erro 'Disk Read Error'.", solution_id: "action_storage", close_guess_ids: ["action_bios", "action_ram"], points_reward: 250, feedbackCorrect: "Isso! O cabo de dados SATA do SSD estava solto. Reconectar resolveu." },
@@ -71,249 +60,261 @@ document.addEventListener("DOMContentLoaded", () => {
         { symptom: "Eu tentei fazer um overclock nas memórias pela BIOS e agora o PC liga, as ventoinhas giram rápido, mas não dá vídeo.", solution_id: "action_cmos_reset", close_guess_ids: ["action_ram", "action_gpu", "action_mobo"], points_reward: 250, feedbackCorrect: "Mestre! Como não dava vídeo, era impossível entrar na BIOS pelo teclado. Fazer o Clear CMOS via Hardware restaurou os padrões e o PC voltou a dar vídeo." }
     ];
 
-    // --- ELEMENTOS DO HTML ---
-    const nameInputScreen = document.getElementById("name-input-screen");
-    const startScreen = document.getElementById("start-screen");
-    const endScreen = document.getElementById("end-screen");
-    const gameContainer = document.getElementById("game-container");
-    const adminScreen = document.getElementById("admin-screen"); 
+    // --- ELEMENTOS E VARIÁVEIS ---
+    const screens = {
+        name: document.getElementById("name-input-screen"),
+        start: document.getElementById("start-screen"),
+        game: document.getElementById("game-container"),
+        end: document.getElementById("end-screen"),
+        admin: document.getElementById("admin-screen")
+    };
     
-    const submitNameButton = document.getElementById("submit-name-button");
-    const startButton = document.getElementById("start-button");
-    const playAgainButton = document.getElementById("play-again-button");
-    const nextButton = document.getElementById("next-button");
-    const openAdminButton = document.getElementById("open-admin-button"); 
-    const closeAdminButton = document.getElementById("close-admin-button"); 
-
+    // Inputs Iniciais
     const nameInput = document.getElementById("name-input");
-    const welcomeMessage = document.getElementById("welcome-message");
-    const startLeaderboardDisplay = document.getElementById("start-leaderboard-display");
-    const endLeaderboardDisplay = document.getElementById("end-leaderboard-display");
-    const adminLeaderboardDisplay = document.getElementById("admin-leaderboard-display"); 
-    const finalScoreText = document.getElementById("final-score-text");
+    const anoInput = document.getElementById("ano-input");
+    const semInput = document.getElementById("semestre-input");
+    const turnoInput = document.getElementById("turno-input");
+    const turmaInput = document.getElementById("turma-input");
     
-    const symptomText = document.getElementById("symptom-text");
-    const hardwareContainer = document.getElementById("hardware-actions");
-    const softwareContainer = document.getElementById("software-actions");
-    const feedbackText = document.getElementById("feedback-text");
-    const scoreDisplay = document.getElementById("score-display");
-    const timerDisplay = document.getElementById("timer-display");
+    // Filtros
+    const filters = [document.getElementById("start-filter"), document.getElementById("end-filter"), document.getElementById("admin-filter")];
 
-    // --- VARIÁVEIS ---
-    let username = "";
+    let currentUserData = {};
     let currentProblemIndex = 0;
     let totalScore = 1000;
     let shuffledProblems = [];
-    let leaderboard = []; 
+    let allLeaderboardData = []; // Guarda TODOS os dados
+    let currentFilterSelection = "ALL"; // Filtro atual
     let timerInterval = null;
     let secondsElapsed = 0;
 
     function showScreen(screenId) {
-        [nameInputScreen, startScreen, gameContainer, endScreen, adminScreen].forEach(screen => {
-            if (screen.id === screenId) {
-                screen.classList.remove("hidden");
-            } else {
-                screen.classList.add("hidden");
-            }
-        });
+        Object.values(screens).forEach(s => s.classList.add("hidden"));
+        document.getElementById(screenId).classList.remove("hidden");
     }
 
-    // --- FIREBASE & PLACAR ---
-    function addScoreToLeaderboard(name, score, time) {
-        const leaderboardRef = db.ref('leaderboard');
-        leaderboardRef.push({ name, score, time }); 
+    // --- FIREBASE & PLACAR COM FILTROS (V10.0) ---
+    function addScoreToLeaderboard(scoreData) {
+        db.ref('leaderboard').push(scoreData); 
     }
 
-    // Função que o Admin usa para excluir do banco de dados
     window.deleteScore = function(firebaseKey) {
         if (confirm("Professor, tem certeza que deseja excluir esta pontuação?")) {
             db.ref('leaderboard/' + firebaseKey).remove();
         }
     };
 
+    window.changeFilter = function(value) {
+        currentFilterSelection = value;
+        // Sincroniza todos os dropdowns de filtro
+        filters.forEach(f => f.value = value);
+        renderLeaderboards(); // Atualiza a tela
+    };
+
     function formatTime(totalSeconds) {
-        const minutes = Math.floor(totalSeconds / 60);
-        const seconds = totalSeconds % 60;
-        return `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
-    }
-
-    function displayLeaderboard(elementId, isAdmin = false) {
-        const displayElement = document.getElementById(elementId);
-        displayElement.innerHTML = ""; 
-
-        if (leaderboard.length === 0) {
-            displayElement.innerHTML = "<li>Nenhum recorde ainda. Seja o primeiro!</li>";
-            return;
-        }
-
-        leaderboard.forEach((entry, index) => {
-            const li = document.createElement("li");
-            
-            if (isAdmin) {
-                li.innerHTML = `
-                    <span>${index + 1}. ${entry.name}</span>
-                    <span>${entry.score} pts</span>
-                    <span>${formatTime(entry.time)}</span>
-                    <button class="delete-btn" onclick="deleteScore('${entry.id}')">Excluir</button>
-                `;
-            } else {
-                li.innerHTML = `
-                    <span>${index + 1}. ${entry.name}</span>
-                    <span>${entry.score} pts</span>
-                    <span>${formatTime(entry.time)}</span>
-                `;
-            }
-            displayElement.appendChild(li);
-        });
+        const m = Math.floor(totalSeconds / 60);
+        const s = totalSeconds % 60;
+        return `${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
     }
 
     function setupLeaderboardListener() {
-        const leaderboardRef = db.ref('leaderboard');
-        
-        leaderboardRef.on('value', (snapshot) => {
+        db.ref('leaderboard').on('value', (snapshot) => {
             const data = snapshot.val();
             if (data) {
-                leaderboard = Object.keys(data).map(key => ({
-                    id: key, 
-                    ...data[key]
-                }));
-                
-                leaderboard.sort((a, b) => {
-                    if (a.score !== b.score) return b.score - a.score;
-                    return a.time - b.time;
-                });
-
-                leaderboard = leaderboard.slice(0, 15); 
+                allLeaderboardData = Object.keys(data).map(key => ({ id: key, ...data[key] }));
+                updateFilterOptions(); // Atualiza a lista de turmas no dropdown
             } else {
-                leaderboard = []; 
+                allLeaderboardData = [];
             }
-            
-            displayLeaderboard('start-leaderboard-display', false);
-            displayLeaderboard('end-leaderboard-display', false);
-            displayLeaderboard('admin-leaderboard-display', true); 
+            renderLeaderboards();
         });
     }
 
-    // --- PAINEL ADMIN LÓGICA ---
-    function openAdminPanel() {
-        const senha = prompt("Digite a senha do Professor:");
-        if (senha === "professor123") {
-            showScreen("admin-screen");
-        } else if (senha !== null) {
-            alert("Senha incorreta!");
-        }
+    function updateFilterOptions() {
+        // Pega todas as "classKeys" únicas do banco de dados
+        const uniqueClasses = new Set();
+        allLeaderboardData.forEach(entry => {
+            if(entry.classKey) uniqueClasses.add(entry.classKey);
+        });
+
+        // Atualiza todos os dropdowns de filtro
+        filters.forEach(select => {
+            select.innerHTML = '<option value="ALL">Geral (Melhores da História)</option>';
+            uniqueClasses.forEach(c => {
+                const opt = document.createElement('option');
+                opt.value = c;
+                opt.textContent = `Turma: ${c}`;
+                // Mantém selecionado se já estava
+                if(c === currentFilterSelection) opt.selected = true;
+                select.appendChild(opt);
+            });
+            select.value = currentFilterSelection; // Força seleção correta
+        });
     }
 
-    // --- TIMER ---
-    function startTimer() {
-        secondsElapsed = 0;
-        timerDisplay.textContent = "Tempo: 00:00";
-        timerInterval = setInterval(() => {
-            secondsElapsed++;
-            timerDisplay.textContent = `Tempo: ${formatTime(secondsElapsed)}`;
-        }, 1000);
+    function renderLeaderboards() {
+        // 1. Aplica o Filtro
+        let filteredData = allLeaderboardData;
+        if (currentFilterSelection !== "ALL") {
+            filteredData = allLeaderboardData.filter(e => e.classKey === currentFilterSelection);
+        }
+
+        // 2. Ordena
+        filteredData.sort((a, b) => {
+            if (a.score !== b.score) return b.score - a.score;
+            return a.time - b.time;
+        });
+
+        // 3. Limita o tamanho (Top 15 Geral, Top 30 na Turma)
+        const limit = currentFilterSelection === "ALL" ? 15 : 30;
+        filteredData = filteredData.slice(0, limit);
+
+        // 4. Desenha nas telas
+        drawList('start-leaderboard-display', filteredData, false);
+        drawList('end-leaderboard-display', filteredData, false);
+        drawList('admin-leaderboard-display', filteredData, true);
     }
-    function stopTimer() { clearInterval(timerInterval); }
+
+    function drawList(elementId, dataArray, isAdmin) {
+        const ul = document.getElementById(elementId);
+        ul.innerHTML = "";
+        if (dataArray.length === 0) {
+            ul.innerHTML = "<li>Nenhum recorde encontrado para este filtro.</li>";
+            return;
+        }
+
+        dataArray.forEach((entry, index) => {
+            const li = document.createElement("li");
+            let html = `<span>${index + 1}. ${entry.name}</span>
+                        <span>${entry.score} pts</span>
+                        <span>${formatTime(entry.time)}</span>`;
+            if (isAdmin) {
+                // No admin, mostra qual é a turma e o botão de apagar
+                html += `<span style="font-size: 0.7em; color: #888;">[${entry.classKey || 'Sem Turma'}]</span>`;
+                html += `<button class="delete-btn" onclick="deleteScore('${entry.id}')">Excluir</button>`;
+            }
+            li.innerHTML = html;
+            ul.appendChild(li);
+        });
+    }
 
     // --- LÓGICA DO JOGO ---
-    function handleNameSubmit() {
+    document.getElementById("submit-name-button").onclick = () => {
         const name = nameInput.value.trim();
-        if (name === "") { alert("Por favor, digite seu nome."); return; }
-        username = name;
-        welcomeMessage.textContent = `Seja bem-vindo, ${username}!`;
+        const t = turmaInput.value.trim().toUpperCase();
+        if (!name) return alert("Digite seu nome!");
+        if (!t) return alert("Digite qual é a sua turma (Ex: A, Info)!");
+
+        // Cria a string única da turma: "2026 - 1º Sem - Manhã - A"
+        const classKey = `${anoInput.value} - ${semInput.value} - ${turnoInput.value} - ${t}`;
+
+        currentUserData = { name, classKey };
+        document.getElementById("welcome-message").textContent = `Bem-vindo, ${name}! (${classKey})`;
+        
+        // Já muda o filtro pra turma dele automaticamente!
+        changeFilter(classKey);
         showScreen("start-screen");
-    }
+    };
 
     function startGame() {
-        totalScore = 1000;
-        currentProblemIndex = 0;
+        totalScore = 1000; currentProblemIndex = 0;
         shuffledProblems = shuffleArray(problemsDB);
-        
-        scoreDisplay.textContent = `Pontuação: ${totalScore}`;
+        document.getElementById("score-display").textContent = `Pontuação: ${totalScore}`;
         showScreen("game-container");
-        startTimer();
-        loadProblem(currentProblemIndex);
+        startTimer(); loadProblem(0);
     }
 
     function endGame() {
         stopTimer();
-        addScoreToLeaderboard(username, totalScore, secondsElapsed);
-        finalScoreText.textContent = `Sua Pontuação Final é: ${totalScore}`;
+        addScoreToLeaderboard({
+            name: currentUserData.name,
+            classKey: currentUserData.classKey,
+            score: totalScore,
+            time: secondsElapsed
+        });
+        document.getElementById("final-score-text").textContent = `Sua Pontuação Final é: ${totalScore}`;
         showScreen("end-screen");
     }
 
-    function shuffleArray(array) {
-        let newArray = [...array];
-        for (let i = newArray.length - 1; i > 0; i--) {
+    function startTimer() {
+        secondsElapsed = 0;
+        timerInterval = setInterval(() => {
+            secondsElapsed++;
+            document.getElementById("timer-display").textContent = `Tempo: ${formatTime(secondsElapsed)}`;
+        }, 1000);
+    }
+    function stopTimer() { clearInterval(timerInterval); }
+
+    function shuffleArray(arr) {
+        let newArr = [...arr];
+        for (let i = newArr.length - 1; i > 0; i--) {
             const j = Math.floor(Math.random() * (i + 1));
-            [newArray[i], newArray[j]] = [newArray[j], newArray[i]];
+            [newArr[i], newArr[j]] = [newArr[j], newArr[i]];
         }
-        return newArray;
+        return newArr;
     }
 
-    function createActionButtons() {
-        hardwareContainer.innerHTML = ""; softwareContainer.innerHTML = "";
-        allActionsDB.hardware.forEach(a => hardwareContainer.appendChild(createButton(a)));
-        allActionsDB.software.forEach(a => softwareContainer.appendChild(createButton(a)));
+    function createButtons() {
+        const hc = document.getElementById("hardware-actions"), sc = document.getElementById("software-actions");
+        allActionsDB.hardware.forEach(a => hc.appendChild(btn(a)));
+        allActionsDB.software.forEach(a => sc.appendChild(btn(a)));
     }
 
-    function createButton(action) {
-        const buttonDiv = document.createElement("div");
-        buttonDiv.id = action.id; buttonDiv.classList.add("action-button");
-        buttonDiv.onclick = () => checkAnswer(action.id);
-        const img = document.createElement("img"); img.src = action.image; img.alt = action.text;
-        const tooltip = document.createElement("span"); tooltip.classList.add("tooltip-text"); tooltip.textContent = action.text;
-        buttonDiv.appendChild(img); buttonDiv.appendChild(tooltip);
-        return buttonDiv;
+    function btn(action) {
+        const div = document.createElement("div");
+        div.id = action.id; div.className = "action-button";
+        div.onclick = () => checkAnswer(action.id);
+        div.innerHTML = `<img src="${action.image}" alt="${action.text}"><span class="tooltip-text">${action.text}</span>`;
+        return div;
     }
 
     function loadProblem(index) {
-        const problem = shuffledProblems[index];
-        symptomText.textContent = problem.symptom;
-        feedbackText.textContent = ""; feedbackText.className = "";
-        nextButton.style.display = "none";
-        document.querySelectorAll('.action-button').forEach(btn => btn.classList.remove("disabled"));
+        const p = shuffledProblems[index];
+        document.getElementById("symptom-text").textContent = p.symptom;
+        document.getElementById("feedback-text").className = "";
+        document.getElementById("feedback-text").textContent = "";
+        document.getElementById("next-button").style.display = "none";
+        document.querySelectorAll('.action-button').forEach(b => b.classList.remove("disabled"));
     }
 
-    function checkAnswer(clickedActionId) {
-        if (document.getElementById(clickedActionId).classList.contains("disabled")) return;
-        const problem = shuffledProblems[currentProblemIndex];
+    function checkAnswer(id) {
+        if (document.getElementById(id).classList.contains("disabled")) return;
+        const p = shuffledProblems[currentProblemIndex];
+        const fb = document.getElementById("feedback-text");
 
-        if (clickedActionId === problem.solution_id) {
-            totalScore += problem.points_reward;
-            feedbackText.textContent = `${problem.feedbackCorrect} (+${problem.points_reward} pts!)`;
-            feedbackText.className = "correct";
-            nextButton.style.display = "block";
-            document.querySelectorAll('.action-button').forEach(btn => btn.classList.add("disabled"));
-        } else if (problem.close_guess_ids.includes(clickedActionId)) {
-            feedbackText.textContent = "Quase lá! Raciocínio correto, mas não resolve. (0 pts)";
-            feedbackText.className = "close-guess";
-            document.getElementById(clickedActionId).classList.add("disabled");
+        if (id === p.solution_id) {
+            totalScore += p.points_reward;
+            fb.textContent = `${p.feedbackCorrect} (+${p.points_reward} pts!)`; fb.className = "correct";
+            document.getElementById("next-button").style.display = "block";
+            document.querySelectorAll('.action-button').forEach(b => b.classList.add("disabled"));
+        } else if (p.close_guess_ids.includes(id)) {
+            fb.textContent = "Quase lá! Raciocínio correto, mas não resolve. (0 pts)"; fb.className = "close-guess";
+            document.getElementById(id).classList.add("disabled");
         } else {
             totalScore -= 100;
-            feedbackText.textContent = "Incorreto. (-100 pts)";
-            feedbackText.className = "incorrect";
-            document.getElementById(clickedActionId).classList.add("disabled");
+            fb.textContent = "Incorreto. (-100 pts)"; fb.className = "incorrect";
+            document.getElementById(id).classList.add("disabled");
         }
-        scoreDisplay.textContent = `Pontuação: ${totalScore}`;
+        document.getElementById("score-display").textContent = `Pontuação: ${totalScore}`;
     }
 
     // --- GATILHOS ---
-    createActionButtons();
+    createButtons();
     setupLeaderboardListener();
     
-    submitNameButton.onclick = handleNameSubmit;
-    startButton.onclick = startGame;
-    playAgainButton.onclick = startGame;
-    nextButton.onclick = () => {
+    document.getElementById("start-button").onclick = startGame;
+    document.getElementById("play-again-button").onclick = startGame;
+    document.getElementById("next-button").onclick = () => {
         currentProblemIndex++;
         if (currentProblemIndex < shuffledProblems.length) loadProblem(currentProblemIndex);
         else endGame();
     };
     
-    // Admin gatilhos
-    openAdminButton.onclick = openAdminPanel;
-    closeAdminButton.onclick = () => showScreen("start-screen");
+    document.getElementById("open-admin-button").onclick = () => {
+        if (prompt("Digite a senha do Professor:") === "professor123") showScreen("admin-screen");
+        else alert("Senha incorreta!");
+    };
+    document.getElementById("close-admin-button").onclick = () => showScreen("start-screen");
     
     showScreen("name-input-screen");
 });
