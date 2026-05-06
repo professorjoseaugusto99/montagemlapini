@@ -7,16 +7,17 @@
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <!-- TELA 1: PEDIR NOME E TURMA -->
+    <!-- TELA 1: PEDIR NOME E TURNO -->
     <div id="name-input-screen" class="screen-overlay">
         <div class="screen-content">
             <h1>Simulador de Defeitos</h1>
-            <p>Preencha seus dados para o placar:</p>
+            <p>Selecione sua turma para o placar:</p>
             
             <input type="text" id="name-input" placeholder="Digite seu nome..." maxlength="20" style="margin-bottom: 10px;">
             
             <div class="turma-inputs">
                 <select id="ano-input">
+                    <option value="2025">2025</option>
                     <option value="2026">2026</option>
                     <option value="2027">2027</option>
                 </select>
@@ -31,8 +32,6 @@
                     <option value="Tarde">Tarde</option>
                     <option value="Noite">Noite</option>
                 </select>
-                
-                <input type="text" id="turma-input" placeholder="Turma (Ex: A, B)" maxlength="5">
             </div>
 
             <button id="submit-name-button" class="action-button-screen">Entrar</button>
@@ -47,7 +46,7 @@
             
             <h2>🏆 Placar de Líderes 🏆</h2>
             
-            <!-- NOVO: Filtro do Placar -->
+            <!-- Filtro do Placar -->
             <select class="placar-filter" id="start-filter" onchange="changeFilter(this.value)">
                 <option value="ALL">Geral (Melhores da História)</option>
             </select>
@@ -67,7 +66,7 @@
             
             <h2>🏆 Placar de Líderes 🏆</h2>
             
-            <!-- NOVO: Filtro do Placar -->
+            <!-- Filtro do Placar -->
             <select class="placar-filter" id="end-filter" onchange="changeFilter(this.value)">
                 <option value="ALL">Geral (Melhores da História)</option>
             </select>
@@ -78,7 +77,7 @@
         </div>
     </div>
 
-    <!-- TELA 4: O JOGO (Mantido igual) -->
+    <!-- TELA 4: O JOGO -->
     <div id="game-container" class="game-container hidden">
         <div class="game-hud">
             <div id="score-display">Pontuação: 1000</div>
