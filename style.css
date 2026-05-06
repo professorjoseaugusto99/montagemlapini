@@ -277,3 +277,38 @@ body {
 .delete-btn:hover {
     background-color: #c82333;
 }
+/* --- ESTILOS DOS FILTROS E INPUTS DE TURMA (V10.0) --- */
+.turma-inputs {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-bottom: 20px;
+    justify-content: center;
+}
+
+.turma-inputs select, .turma-inputs input {
+    padding: 10px;
+    font-size: 1em;
+    border: 2px solid #ddd;
+    border-radius: 5px;
+    outline: none;
+    flex: 1;
+    min-width: 120px;
+}
+
+.turma-inputs select:focus, .turma-inputs input:focus {
+    border-color: #007bff;
+}
+
+.placar-filter {
+    width: 100%;
+    padding: 10px;
+    font-size: 1.1em;
+    margin-top: 10px;
+    border: 2px solid #007bff;
+    border-radius: 5px;
+    background-color: #f8f9fa;
+    color: #333;
+    font-weight: bold;
+    cursor: pointer;
+}
