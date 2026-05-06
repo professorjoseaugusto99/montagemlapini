@@ -1,7 +1,16 @@
 /* Configurações básicas */
+/* Configurações básicas com Papel de Parede */
 body {
-    font-family: Arial, sans-serif;
-    background-color: #f0f2f5;
+    font-family: 'Segoe UI', Arial, sans-serif;
+    /* Adicionando a imagem de fundo: */
+    background-image: url('imagens/fundo.jpg'); 
+    background-size: cover; /* Faz a imagem preencher a tela toda */
+    background-position: center;
+    background-attachment: fixed; /* O fundo não rola junto com a tela */
+    
+    /* Uma cor de fallback caso a imagem demore a carregar */
+    background-color: #1a1a2e; 
+    
     display: flex;
     justify-content: center;
     align-items: center;
@@ -27,11 +36,13 @@ body {
     box-sizing: border-box;
 }
 
+/* Efeito de Vidro (Glassmorphism) na caixa branca */
 .screen-content {
-    background-color: #ffffff;
+    background-color: rgba(255, 255, 255, 0.90); /* 90% branco, 10% transparente */
+    backdrop-filter: blur(8px); /* Borra o fundo que passa pela transparência */
     padding: 30px 40px;
-    border-radius: 10px;
-    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.3);
+    border-radius: 12px; /* Bordas um pouco mais arredondadas */
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5); /* Sombra mais forte para destacar do fundo */
     text-align: center;
     max-width: 600px;
     width: 100%;
@@ -68,21 +79,24 @@ body {
 }
 
 /* Botão grande para telas */
+/* Botão Tech */
 .action-button-screen {
-    background-color: #28a745;
+    background-color: #0056b3; /* Azul escuro tech */
     color: white;
     border: none;
     padding: 15px 30px;
     font-size: 1.2em;
     font-weight: bold;
-    border-radius: 5px;
+    border-radius: 8px;
     cursor: pointer;
-    transition: background-color 0.2s;
+    transition: all 0.3s ease;
     margin-top: 20px;
     width: 100%;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.2);
 }
 .action-button-screen:hover {
-    background-color: #218838;
+    background-color: #007bff; /* Azul mais claro ao passar o mouse */
+    transform: translateY(-2px); /* Botão "pula" de leve pra cima */
 }
 
 /* Classe auxiliar para esconder/mostrar */
